@@ -19,67 +19,53 @@ fetch(pcUrl)
     console.log(pc);
   })
   .catch(err => {
-    console.log('Чтото пошло не так:', err);
+    console.log('ERROR', err);
   });
 
-let paths = [];
 app.get(/^(?:task3A\/)?(.*?)(?:\/)?$/, async function(req, res) {
-    let path = req.params[0];
-    var paths = path.split('\/');
-    var ex1 = pc;
-    var valu = {};
-    console.log(paths.length);
+  let path = req.params[0];
+  var paths = path.split('\/');
 
-    if(paths[2] == 'volumes'){
-        //count
-        var hdd = pc.hdd;
-        console.log("length = ",hdd.length);
-        let keys= [];
-        let map = [];
-        keys[0] = hdd[0].volume;
-        map[0] = hdd[0].size;
-        for(var i=1;i<hdd.length;i++){
-          var j;
-          for(j=keys.length-1; j>=0; j-- )
-          {
-            if(keys[j]==hdd[i].volume){
-              map[j] = map[j] + hdd[i].size;
-              break;
-            }
-          }
-          if(j<0){
-            var t = map.length;
-            keys[t]= hdd[i].volume;
-            map[t] = hdd[i].size;
-          }
-        }
-          var answerr1="";
-        for(var i=0;i<keys.length;i++){
-          if(i>0){
-            answerr1 += ",";
-          }
-          answerr1 += "\"" + keys[i] + "\"" + ":" + "\"" + map[i] +"\"";
-        }
-        console.log("   =>  ", answerr1);
-        var jssponO = JSON.stringify(answerr1);
-        var revert = JSON.parse(jssponO);
-        console.log("   =>  ", revert);
-        res.status(200).json(revert);
-    }
-    else {
-      for(var i=2;i<paths.length;i++) {
-          valu = paths[i];
-          ex1 = ex1[valu];
-          if(ex1 === undefined) {
-            var answered = '- Status 404' +'\n' +'Not found'
-            res.status(404).send(answered);
-          }
-        }
-      console.log(valu , "   =>  ", ex1);
-      res.status(200).json(ex1);
-    }
+  if(paths[2] == 'volumes'){
+    //count menory
+    let result = {};
+    var hdd = pc.hdd;
+    const array = [];
+    for(var i=0;i<hdd.length;i++){
+      if (array.indexOf(hdd[i].volume) == -1){
+             array.push(hdd[i].volume);
+         let res= hdd[i].volume;
 
-    });
+         result[res] = result[res] || 0;
+         result[res] += hdd[i].size;
+      }
+      else {
+         let res= hdd[i].volume;
+         result[res] += hdd[i].size;
+      }
+    }
+    for(var key in result){
+      result[key] += "B";
+    }
+    res.status(200).json(result);
+  }
+  else {
+    var step = pc;
+    var prevStep = {};
+
+    for(var l=2;l<paths.length;l++) {
+      prevStep = paths[l];
+      step = step[prevStep];
+
+      if(((paths[l] == 'hdd')&(paths[l+1] === 'length'))||
+         (step === undefined)||(((paths[l]=='length')&(l>2)))) {
+        res.status(404).send('Not Found');
+        break;
+      }
+    }
+    res.status(200).json(step);
+  }
+});
 
 app.listen(3000, () => {
   console.log('Your app listening on port 3000!');
