@@ -1,0 +1,1 @@
+{"version":3,"file":null,"sources":["../src/index.js"],"sourcesContent":["const Apps = require('./application');\r\n\r\nconst app = new Apps();\r\napp.run();\r\n"],"names":["Apps","require","app","run"],"mappings":";;AAAA,IAAMA,OAAOC,QAAQ,eAAR,CAAb;;AAEA,IAAMC,MAAM,IAAIF,IAAJ,EAAZ;AACAE,IAAIC,GAAJ"}
